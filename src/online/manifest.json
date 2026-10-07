@@ -1,0 +1,16 @@
+{
+  "id": "sonic3k.online-adventure",
+  "name": "Online Adventure",
+  "version": "1.0.0",
+  "native_library": "OnlineAdventure.dll",
+  "host_abi": 1,
+  "host_id": "sonic3k-v0.5.2-online-1",
+  "protocol": 6,
+  "max_players": 8,
+  "upstream": "https://github.com/mstan/Sonic3AndKnucklesRecomp",
+  "upstream_commit": "6bf6fd047ccccd72142bd71841d57792a5e267ff",
+  "game": "sonic3k",
+  "platform": "windows-x64",
+  "requires_patched_host": true,
+  "default_enabled": false
+}

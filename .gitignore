@@ -1,0 +1,10 @@
+build/
+build-*/
+guest-stage/
+generation-stage/
+*.bin
+*.exe
+*.srm
+*.pdb
+*.ram
+__pycache__/

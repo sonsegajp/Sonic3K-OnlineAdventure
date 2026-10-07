@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.20)
+project(OnlineAdventure VERSION 1.1.0 LANGUAGES C CXX)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+add_library(version SHARED src/loader/version.cpp src/loader/version.def)
+target_compile_definitions(version PRIVATE _CRT_SECURE_NO_WARNINGS)
+set_target_properties(version PROPERTIES PREFIX "")
+
+set(S3_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Sonic3KRecomp" CACHE PATH "Pinned Sonic 3 and Knuckles source checkout")
+set(RUNNER_ROOT "${S3_ROOT}/segagenesisrecomp/runner")
+set(SDL2_DIR "${RUNNER_ROOT}/external/SDL2/SDL2-2.28.5/cmake")
+find_package(SDL2 REQUIRED CONFIG NO_DEFAULT_PATH PATHS "${SDL2_DIR}")
+set(IMGUI "${S3_ROOT}/recomp-ui/src/third_party/imgui")
+set(RNET_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(RNET_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(RBE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory("${S3_ROOT}/segagenesisrecomp/external/recomp-net" recomp-net)
+add_subdirectory("${S3_ROOT}/segagenesisrecomp/external/rbengine" rbengine)
+set(STOCK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../stock-reference" CACHE PATH "Matching unmodified v0.5.2 source checkout")
+set(MINHOOK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../minhook" CACHE PATH "MinHook v1.3.4 checkout")
+add_subdirectory("${MINHOOK_ROOT}" minhook)
+add_library(OnlineAdventure SHARED
+ build/generated/guest_hooks.c build/generated/guest_table.c src/loader/online_settings.c
+ src/loader/stock_adapter.cpp src/renderer/genesis_vdp.c src/renderer/sonic3_video.c
+ src/online/sonic3k_coop.cpp src/online/adventure_progress.cpp src/online/online_module.cpp src/online/codec_kosinski.c
+ "${IMGUI}/imgui.cpp" "${IMGUI}/imgui_draw.cpp" "${IMGUI}/imgui_tables.cpp" "${IMGUI}/imgui_widgets.cpp"
+ "${IMGUI}/backends/imgui_impl_sdl2.cpp" "${IMGUI}/backends/imgui_impl_sdlrenderer2.cpp")
+target_include_directories(OnlineAdventure PRIVATE src/online src/loader src/renderer "${STOCK_ROOT}/segagenesisrecomp/runner" "${STOCK_ROOT}/segagenesisrecomp/runner/include" "${STOCK_ROOT}/segagenesisrecomp/runner/video" "${STOCK_ROOT}/segagenesisrecomp/runner/external/superzazu" "${S3_ROOT}/recomp-ui/include" "${S3_ROOT}/recomp-ui/src" "${RUNNER_ROOT}" "${RUNNER_ROOT}/include" "${IMGUI}" "${IMGUI}/backends")
+target_compile_definitions(OnlineAdventure PRIVATE _CRT_SECURE_NO_WARNINGS RECOMP_LAUNCHER=1 SONIC_REVERSE_DEBUG=0)
+target_compile_options(OnlineAdventure PRIVATE /utf-8)
+target_link_libraries(OnlineAdventure PRIVATE minhook SDL2::SDL2 ws2_32 bcrypt recomp_net retcomm_rbengine)
+
+option(OA_TEST_CONTROL "Compile local integration-test controls (never distribute)" OFF)
+if(OA_TEST_CONTROL)
+ target_compile_definitions(OnlineAdventure PRIVATE OA_TEST_CONTROL=1)
+ add_executable(remote_motion_test tests/remote_motion_test.cpp)
+ target_include_directories(remote_motion_test PRIVATE src/online)
+ add_executable(shared_world_test tests/shared_world_test.cpp)
+ target_include_directories(shared_world_test PRIVATE src/online)
+endif()
