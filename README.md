@@ -46,7 +46,7 @@ Renaming another version does not make it compatible.
 ## Install
 
 1. **Get the game working first.** Launch the official v0.5.2 `Sonic3KRecomp.exe` once and make sure it reaches the title screen with your ROM. Then close it completely.
-2. **Download the mod.** Open this repository's [Releases](../../releases) page and download `Online Adventure shared-world preview.15.zip` from the latest release.
+2. **Download the mod.** Open this repository's [Releases](../../releases) page and download `Online.Adventure.shared-world.preview.15.zip` from the latest release.
 3. **Find your game folder.** This is the folder that contains `Sonic3KRecomp.exe`.
 4. **Back up an existing loader (if any).** If that folder already has a `version.dll` from another mod loader, copy it somewhere safe first. Online Adventure installs its own `version.dll`.
 5. **Copy the files.** Extract the zip and copy these three items into the game folder, keeping the folder structure exactly as it is:
